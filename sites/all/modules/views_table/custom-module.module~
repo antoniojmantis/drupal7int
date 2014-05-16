@@ -1,0 +1,64 @@
+<?php
+/**
+ * @file
+ * Simplenews node handling, sent email, newsletter block and general hooks
+ */
+
+
+
+/**
+ * Implements hook_permission().
+ *
+ * @todo Change sort order where required: http://drupal.org/node/224333#sorting_permissions
+ */
+function simplenews_permission() {
+  return array(
+    'administer newsletters' => array(
+      'title' => t('Administer newsletters'),
+    ),
+    'administer simplenews subscriptions' => array(
+      'title' => t('Administer simplenews subscriptions'),
+    ),
+    'administer simplenews settings' => array(
+      'title' => t('Administer simplenews settings'),
+    ),
+    'send newsletter' => array(
+      'title' => t('Send newsletter'),
+    ),
+    'subscribe to newsletters' => array(
+      'title' => t('Subscribe to newsletters'),
+    ),
+  );
+}
+
+
+/**
+ * Implements hook_menu().
+ */
+function simplenews_menu() {
+  $items['admin/content/simplenews'] = array(
+    'title' => 'Newsletters',
+    'description' => 'List newsletters and newsletter sent status.',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('simplenews_admin_newsletter_issues'),
+    'access arguments' => array('administer newsletters'),
+    'file' => 'includes/simplenews.admin.inc',
+  );
+  $items['admin/config/services/simplenews'] = array(
+    'title' => 'Newsletters',
+    'description' => 'Configure your sites newsletters.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('simplenews_admin_categories'),
+    'access arguments' => array('administer newsletters'),
+    'file' => 'includes/simplenews.admin.inc',
+  );
+
+
+  $items['admin/config/services/simplenews/categories'] = array(
+    'title' => 'Newsletters',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  return $items;
+}

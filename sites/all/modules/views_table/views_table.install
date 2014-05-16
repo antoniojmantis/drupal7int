@@ -1,0 +1,67 @@
+<?php
+/**
+ * @file
+ * Descripción
+ */
+
+
+/**
+ * Implements hook_schema().
+ */
+function views_table_schema() {
+  $schema['views_table'] = array(
+    'fields' => array(
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => 0,
+        'description' => 'Primary key; refers to {node}.nid.',
+      ),
+      'deporte' => array(
+        'description' => 'Deporte que practica el usuario',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('nid'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function views_table_install() {
+  //drupal_install_schema('views_table');
+
+  $tabla = 'views_table';
+  
+  for ($i=0; $i<10; $i++){
+    $registro = new stdClass();
+    $registro->nid = $i;
+    $registro->deporte = 'deporte_' . $i;
+    drupal_write_record($tabla, $registro);
+  }
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function views_table_uninstall() {
+  cache_clear_all('views_table:*', 'cache', TRUE);
+
+  db_query("DROP TABLE {views_table}");
+}
+
+/**
+ * Removes file path field from table
+ */
+function views_table_6000() {
+  $ret = array();
+  db_drop_field($ret, 'views_table', 'file_path');
+  return $ret;
+}     

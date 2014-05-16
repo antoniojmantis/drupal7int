@@ -1,0 +1,7 @@
+name = Custom Module
+description = Módulo para tests de desarrollo
+package = Custom
+core = 7.x
+
+files[] = custom_module.module
+files[] = custom_module.admin.inc

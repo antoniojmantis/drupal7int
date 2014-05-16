@@ -1,0 +1,147 @@
+<?php
+/**
+ * @file
+ * Agrega una tabla al esquema para que su información esté disponible en views
+ */
+
+
+// MOSTRAR CAMPOS DE TABLA PERSONALIZADA EN VIEWS 
+/**
+ * Implements hook_views_api().
+ */
+function views_table_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'views_table') . '/views',
+  );
+}
+
+
+// CREAR VIEW MODE PERSONALIZADO
+/**
+* Implements hook_entity_info_alter().
+*/
+function views_table_entity_info_alter(&$entity_info) {
+    $entity_info['node']['view modes']['slider'] = array(
+        'label' => t('Slider'),
+        'custom settings' => TRUE,
+    );
+}
+
+/** 
+ * Implements hook_preprocess_node().
+ */ 
+function views_table_preprocess_node(&$vars) {  
+    if ($vars['view_mode'] == 'slider' ) {
+        $vars['theme_hook_suggestions'][] = 'node__' . $vars['type'] . '__slider';
+    }
+}
+
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function views_table_field_formatter_info() {
+  $formatters = array(
+    'link' => array(
+      'label' => t('Convert to link'),
+      'field types' => array('text'),
+      'settings' => array('target' => ''),
+    ),
+  );
+
+  return $formatters;
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function views_table_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  
+  $element = array();
+  
+  //Opciones
+  $link_types = array(
+    'self' => t('This window'),
+    'blank' => t('New window'),
+  );
+  
+  //Formateador
+  $element['target'] = array(
+    '#title' => t('Open in'),
+    '#type' => 'select',
+    '#default_value' => $settings['target'],
+    '#options' => $link_types,
+  );
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function views_table_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $summary = array();
+
+  $link_types = array(
+    'self' => t('Open in this window'),
+    'blank' => t('Open in new window'),
+  );
+  
+  //unset($link_types['']);
+
+  if (isset($link_types[$settings['target']])) {
+    $summary[] = t('Configured: @type', array('@type' => $link_types[$settings['target']]));    
+  }
+  else {
+    $summary[] = t('Configuring pending');
+  }
+
+  return implode('<br />', $summary);
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function views_table_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $elements = array();
+  foreach ($items as $delta => $item) {
+    $element = array('element' => $item, 'field' => $instance, 'display' => $display);
+    $elements[$delta] = array(
+      '#markup' => theme('views_table_formatter_'. $display['type'], $element),     
+    );         
+  }     
+  return $elements;   
+}
+
+/** 
+ ** Implements hook_theme(). 
+ */ 
+function views_table_theme() { 
+    return array( 
+        'views_table_formatter_link' => array( 
+            'variables' => array('element' => NULL), 
+        ), 
+    ); 
+}
+
+/** 
+ * Theme function for views_table_formatter_link. 
+ */
+function theme_views_table_formatter_link($elements) { 
+    dpm($elements);
+    
+    $attributes = array();
+    if ($elements['display']['settings']['target'] == 'blank'){
+        $attributes['target'] = 'blank';        
+        $attributes['class'] = 'miclass';        
+        //return '<a href="http://' . $elements['element']['value'] . '" target="_blank">Visitar URL</a>'; 
+    }
+    return l(t('Visit this URL'), $elements['element']['value'], array('attributes' => $attributes));   
+}
+

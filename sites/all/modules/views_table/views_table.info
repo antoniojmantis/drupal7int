@@ -1,0 +1,7 @@
+name = Views Table
+description = Agrega una tabla al esquema para que su información esté disponible en views
+package = Custom
+core = 7.x
+
+files[] = views_table.module
+files[] = views_table.field.inc

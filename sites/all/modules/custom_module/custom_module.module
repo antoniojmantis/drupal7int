@@ -1,0 +1,35 @@
+<?php
+/**
+ * @file
+ * Custom module para pruebas de desarrollos
+ */
+
+
+/**
+ * Implements hook_permission().
+ */
+function custom_module_permission() {
+  return array(
+    'administer custom module' => array(
+      'title' => t('Administer custom module'),
+    ),
+  );
+}
+
+
+/**
+ * Implements hook_menu().
+ */
+function custom_module_menu() {
+  $items['admin/config/custommodule'] = array(
+    'title' => 'Custom Module',
+    'description' => '',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('custom_module_admin_settings'),
+    'access arguments' => array('administer custom module'),
+    'file' => 'custom_module.admin.inc'
+  );
+
+  return $items;
+}

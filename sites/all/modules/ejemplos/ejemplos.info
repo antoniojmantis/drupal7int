@@ -1,0 +1,7 @@
+name = Ejemplos
+description = Modulo de ejemplos.
+core = 7.x
+version = "7.x-1.0"
+package = Custom
+files[] = ejemplos.module
+files[] = views/ejemplos_handler_nid.inc
